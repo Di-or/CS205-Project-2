@@ -1,5 +1,6 @@
 import numpy as np
 
+# loads data and z-normalizes it 
 def load_data(name):
     data = np.loadtxt(name)
     labels = data[:, 0].astype(int)
@@ -9,8 +10,8 @@ def load_data(name):
     features = (features - means) / stds
     return labels, features
 
+# performs nearest neighbor algorithm with leave one out 
 def nearest_neighbor(labels, features, selected_feats):
-    n_data = len(labels)
     data = features[:, list(selected_feats)]
     correct_pred = 0
 
@@ -27,8 +28,6 @@ def nearest_neighbor(labels, features, selected_feats):
 # Used a built in scikit learn KNN classifier on the
 # small dataset to check if my NN implementation was correct
 # and it was as both got 79.1% accuracy
-
-
 
 
 if __name__ == "__main__":
