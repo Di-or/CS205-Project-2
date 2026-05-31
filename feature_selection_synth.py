@@ -29,9 +29,46 @@ def nearest_neighbor(labels, features, selected_feats):
 # small dataset to check if my NN implementation was correct
 # and it was as both got 79.1% accuracy
 
+def forward_selection(labels, features):
+    curr_feats = set()
+    best_acc = 0
+    best_feats = set()
+ 
+    print("\nBeginning search.\n")
+ 
+    for i in range(features.shape[1]):
+        best_curr_acc = 0
+        best_feature = None
+ 
+        for f in range(features.shape[1]):
+            if f in curr_feats:
+                continue
+            test_feats = set(curr_feats)
+            test_feats.add(f)
+            curr_acc = nearest_neighbor(labels, features, test_feats)
+            print("\tUsing feature(s)", sorted(test_feats), "accuracy is", curr_acc * 100, "%")
+ 
+            if curr_acc > best_curr_acc:
+                best_curr_acc = curr_acc
+                best_feature = f
+ 
+        curr_feats.add(best_feature)
+ 
+        if best_curr_acc < best_acc:
+            print("\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
+ 
+        print("Feature set", sorted(curr_feats), "was best, accuracy is", best_curr_acc * 100, "%\n")
+ 
+        if best_curr_acc > best_acc:
+            best_acc = best_curr_acc
+            best_feats = set(curr_feats)
+ 
+    print("Finished search!! The best feature subset is", sorted(best_feats), "which has an accuracy of", best_acc * 100, "%")
+
 
 if __name__ == "__main__":
     name = input("Enter the name of the data file: ")
     labels, features = load_data(name)
     selected_features = set(range(features.shape[1]))
     print(nearest_neighbor(labels, features, selected_features))
+    forward_selection(labels, features)
