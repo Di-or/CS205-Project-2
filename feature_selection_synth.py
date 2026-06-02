@@ -46,7 +46,7 @@ def forward_selection(labels, features):
             test_feats = set(curr_feats)
             test_feats.add(f)
             curr_acc = nearest_neighbor(labels, features, test_feats)
-            print("\tUsing feature(s)", sorted(test_feats), "accuracy is", curr_acc * 100, "%")
+            print("Using feature(s)", sorted(test_feats), "accuracy is", curr_acc * 100, "%")
  
             if curr_acc > best_curr_acc:
                 best_curr_acc = curr_acc
@@ -66,9 +66,53 @@ def forward_selection(labels, features):
     print("Finished search!! The best feature subset is", sorted(best_feats), "which has an accuracy of", best_acc * 100, "%")
 
 
+
+def backward_elimination(labels, features):
+    curr_feats = set(range(features.shape[1]))
+    best_acc = nearest_neighbor(labels, features, curr_feats)
+    best_feats = set(curr_feats)
+
+    print("\nRunning nearest neighbor using all features achieves an accuracy of", best_acc * 100, "%")
+    print("\nBeginning search.\n")
+
+    for i in range(features.shape[1] - 1):
+        best_curr_acc = 0
+        worst_feature = None
+
+        for f in sorted(curr_feats):
+            test_feats = set(curr_feats)
+            test_feats.remove(f)
+            curr_acc = nearest_neighbor(labels, features, test_feats)
+            print("Using feature(s)", sorted(test_feats), "accuracy is", curr_acc * 100, "%")
+
+            if curr_acc > best_curr_acc:
+                best_curr_acc = curr_acc
+                worst_feature = f
+
+        curr_feats.remove(worst_feature)
+
+        if best_curr_acc < best_acc:
+            print("\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
+
+        print("Feature set", sorted(curr_feats), "was best, accuracy is", best_curr_acc * 100, "%\n")
+
+        if best_curr_acc > best_acc:
+            best_acc = best_curr_acc
+            best_feats = set(curr_feats)
+
+    print("Finished search!! The best feature subset is", sorted(best_feats), "which has an accuracy of", best_acc * 100, "%")
+
+
 if __name__ == "__main__":
     name = input("Enter the name of the data file: ")
     labels, features = load_data(name)
     selected_features = set(range(features.shape[1]))
     print(nearest_neighbor(labels, features, selected_features))
-    forward_selection(labels, features)
+    print("\nType the number of the algorithm you want to run.")
+    print("1) Forward Selection")
+    print("2) Backward Elimination")
+    algo = input("\n")
+    if algo == "1":
+        forward_selection(labels, features)
+    elif algo == "2":
+        backward_elimination(labels, features)
