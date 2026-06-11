@@ -1,8 +1,13 @@
 import numpy as np
 
+#Our code handles both our synthetic and real datasets as the only change needed is how the data is loaded
+
 # loads data and z-normalizes it 
 def load_data(name):
-    data = np.loadtxt(name)
+    if name.endswith('.csv'):
+        data = np.loadtxt(name, delimiter=',', skiprows=1)
+    else:
+        data = np.loadtxt(name)
     labels = data[:, 0].astype(int)
     features = data[:, 1:]
     means = features.mean(axis=0)
@@ -27,8 +32,9 @@ def nearest_neighbor(labels, features, selected_feats):
 
 # Used a built in scikit learn KNN classifier on the
 # small dataset to check if my NN implementation was correct
-# and it was as both got 79.1% accuracy
+# and it was as both got the same accuracy
 
+#performs forward selection algorithm to find the best subset of features with the NN classifier
 def forward_selection(labels, features):
     curr_feats = set()
     best_acc = 0
@@ -66,7 +72,7 @@ def forward_selection(labels, features):
     print("Finished search!! The best feature subset is", sorted(best_feats), "which has an accuracy of", best_acc * 100, "%")
 
 
-
+#performs the backward elimination algorithm to find the best subset of features with the NN classifier
 def backward_elimination(labels, features):
     curr_feats = set(range(features.shape[1]))
     best_acc = nearest_neighbor(labels, features, curr_feats)
